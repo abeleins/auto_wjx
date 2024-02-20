@@ -1,5 +1,7 @@
 import logging
 import random
+import traceback
+
 from selenium import webdriver
 from selenium.common import TimeoutException, NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.common.by import By
@@ -7,6 +9,8 @@ from selenium.webdriver.support.expected_conditions import presence_of_element_l
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver import ActionChains
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 import numpy as np
 import time
 
@@ -16,36 +20,54 @@ import conf
 def choose_answer():
     try:
         choose_one(1)  # 各项均为相同概率，可省略不写。
-        elemen_tinput(2 , "测试2")
-        elemen_tinput(3 , "测试3")
-        elemen_tinput(4 , "测试4")
-        elemen_tinput(5 , "测试4",xpathtxt="//*[@id=\"div5\"]/div[3]/input")
-        elemen_tinput(6 , "测试")
-        elemen_tinput(7 , "测试")
-        elemen_tinput(8 , "测试4")
-        elemen_tinput(9 , "测试4")
-        elemen_tinput(10 , "天津-天津市-和平区",jschange=True)
-        elemen_tinput(11 , "天津-天津市-和平区")
-        choose_one(12)
-        choose_multiple(13)  # 排除第 3 题中，第 2, 3 个选项。
-        choose_multiple(14)
-        choose_multiple(15)
-        choose_multiple(16)
-        choose_multiple(17,[0.3, 0.3, 0.3, 0.1])
-        choose_multiple(18)
-        choose_multiple(19)
-        choose_multiple(20)
-        choose_multiple(21)
-        choose_multiple(22)
-        choose_multiple(23)
-        choose_multiple(24)
-        choose_multiple(25)
-        choose_multiple(26)
-        choose_multiple(27)
-        choose_multiple(28)
-        choose_multiple(29)
+        choose_one(2, [0.1, 0.25, 0.28, 0.28, 0.09])  # 各项均为相同概率，可省略不写。
+        choose_one(3)  # 各项均为相同概率，可省略不写。
+        choose_one(4)  # 各项均为相同概率，可省略不写。
+        choose_one(5)  # 各项均为相同概率，可省略不写。
+        choose_one(6, [0.1, 0.2, 0.3, 0.3, 0.1])  # 各项均为相同概率，可省略不写。
+        choose_one(7, [0.2, 0.3, 0.5])  # 各项均为相同概率，可省略不写。
+        choose_one(8, [0.16, 0.18, 0.36, 0.2, 0.1])  # 各项均为相同概率，可省略不写。
+        choose_one(9, [0.53, 0.2, 0.09, 0.18])  # 各项均为相同概率，可省略不写。
+        choose_one(10, [0.06, 0.38, 0.24, 0.32])  # 各项均为相同概率，可省略不写。
+        choose_one(11, [0.1, 0.2, 0.33, 0.16, 0.21])  # 各项均为相同概率，可省略不写。
+        choose_one(12, [0.32, 0.33, 0.30, 0.05])  # 各项均为相同概率，可省略不写。
+        choose_one(13, [0.21, 0.3, 0.1, 0.06, 0.33])  # 各项均为相同概率，可省略不写。
+        choose_one(14, [0.16, 0.2, 0.3, 0.3, 0.04])  # 各项均为相同概率，可省略不写。
+        choose_one(15, [0.6, 0.03, 0.07, 0.3])  # 各项均为相同概率，可省略不写。
+        choose_one(16, [ 0.1, 0.1, 0.3, 0.3, 0.1])  # 各项均为相同概率，可省略不写。
+        choose_one(17, [ 0.2, 0.1, 0.1, 0.4, 0.2])  # 各项均为相同概率，可省略不写。
+
+        # elemen_tinput(2,  "测试2")
+        # elemen_tinput(3,  "测试3")
+        # elemen_tinput(4,  "测试4")
+        # elemen_tinput(5,  "测试4",xpathtxt="//*[@id=\"div5\"]/div[3]/input")
+        # elemen_tinput(6,  "测试")
+        # elemen_tinput(7,  "测试")
+        # elemen_tinput(8,  "测试4")
+        # elemen_tinput(9,  "测试4")
+        # elemen_tinput(10,  "天津-天津市-和平区",jschange=True)
+        # elemen_tinput(11,  "天津-天津市-和平区")
+        # choose_one(12)
+        # choose_multiple(13)  # 排除第 3 题中，第 2, 3 个选项。
+        # choose_multiple(14)
+        # choose_multiple(15)
+        # choose_multiple(16)
+        # choose_multiple(17,[0.3, 0.3, 0.3, 0.1])
+        # choose_multiple(18)
+        # choose_multiple(19)
+        # choose_multiple(20)
+        # choose_multiple(21)
+        # choose_multiple(22)
+        # choose_multiple(23)
+        # choose_multiple(24)
+        # choose_multiple(25)
+        # choose_multiple(26)
+        # choose_multiple(27)
+        # choose_multiple(28)
+        # choose_multiple(29)
     except NoSuchElementException:
         logging.error("任务执行失败，请检查配置。")
+        print(traceback.format_exc())
 
 
 def probabilities_generator(choices_num, exclude=None):
@@ -65,16 +87,21 @@ def choose_one(question_number, question_probability=None, exclude=None):
     :param question_probability: [] # If you set it None, It will auto generate an averages list.
     :param exclude: [] # A list which question index you want to exclude.
     """
-    el_choices = driver.find_elements(By.XPATH, f"//*[@id=\"div{question_number}\"]/div[2]/div")
-    choices_num = len(el_choices)
-    if not question_probability:
-        question_probability = probabilities_generator(choices_num, exclude=exclude)
-    chosen_number = np.random.choice(
-        a=list(range(1, choices_num + 1)),
-        p=question_probability
-    )
-    el_checked = driver.find_element(By.XPATH, f"//*[@id=\"div{question_number}\"]/div[2]/div[{chosen_number}]")
-    el_checked.click()
+    try:
+        el_choices = driver.find_elements(By.XPATH, f"//*[@id=\"div{question_number}\"]/div[2]/div")
+        choices_num = len(el_choices)
+        if not question_probability:
+            question_probability = probabilities_generator(choices_num, exclude=exclude)
+            print(question_probability);
+        chosen_number = np.random.choice(
+            a=list(range(1, choices_num + 1)),
+            # p=question_probability
+        )
+        el_checked = driver.find_element(By.XPATH, f"//*[@id=\"div{question_number}\"]/div[2]/div[{chosen_number}]")
+        el_checked.click()
+    except NoSuchElementException:
+        logging.error("任务执行失败，请检查配置。")
+        print(traceback.format_exc())
 
 
 def choose_multiple(question_number, question_probability=None, restrict=10000, exclude=None):
@@ -91,13 +118,13 @@ def choose_multiple(question_number, question_probability=None, restrict=10000, 
     for i in chosen_number:
         driver.find_element(By.XPATH, f"//*[@id=\"div{question_number}\"]/div[2]/div[{i}]").click()
 
-def elemen_tinput(question_number , question_txt=None,jschange=False,xpathtxt=None):
+def elemen_tinput(question_number,  question_txt=None,jschange=False,xpathtxt=None):
     if not xpathtxt:
         el_checked = driver.find_element(By.XPATH, f"//*[@id=\"div{question_number}\"]/div[2]/input")
     else:
-        el_checked = driver.find_element(By.XPATH , xpathtxt)
+        el_checked = driver.find_element(By.XPATH,  xpathtxt)
     if jschange:
-        driver.execute_script(f'arguments[0].value="{question_txt}"' , el_checked)
+        driver.execute_script(f'arguments[0].value="{question_txt}"',  el_checked)
     else:
         el_checked.send_keys(question_txt)
 
@@ -128,12 +155,24 @@ def main():
             except NoSuchElementException:
                 pass
             choose_answer()
+            # driver.find_element(By.XPATH, '//*[@id="alert_box"]/div[2]/div[2]/button').click()
+            # time.sleep(0.5)
+
+            try:
+                element = driver.find_element(By.XPATH, '//*[@id="#rectTop"]')
+                element.click()
+                time.sleep(1)
+            except NoSuchElementException:
+                print("Element does not exist, no action performed.")
+            # try:
+            #     element2 = driver.find_element(By.XPATH, '//*[@id="rectBottom"]')
+            #     element2.click()
+            #     time.sleep(1)
+            # except NoSuchElementException:
+            #     print("Element does not exist, no action performed.")
             driver.find_element(By.XPATH, '//*[@id="ctlNext"]').click()
-            time.sleep(0.5)
-            driver.find_element(By.XPATH, '//*[@id="alert_box"]/div[2]/div[2]/button').click()
-            time.sleep(0.5)
-            driver.find_element(By.XPATH, '//*[@id="rectMask"]').click()
-            time.sleep(0.5)
+            time.sleep(1)
+            #rectTop#rectBottom
             print(f"第 {i} 次任务执行成功。")
             try:
                 WebDriverWait(driver, 15).until(
@@ -149,8 +188,10 @@ def main():
 
 
 if __name__ == '__main__':
-    question_url = conf.QUESTION_URL or input("请输入问卷地址：")
-    loop_count = conf.LOOP_COUNT or int(input("请输入填写次数："))
+    # driver = webdriver.Chrome(ChromeDriverManager().install())
+    # question_url = conf.QUESTION_URL or input("请输入问卷地址：")
+    question_url = "https://www.wjx.cn/vm/Q0IdCwo.aspx"
+    loop_count = 200
     opt = webdriver.ChromeOptions()
     opt.add_experimental_option('excludeSwitches', ['enable-automation'])
     opt.add_experimental_option('useAutomationExtension', False)
